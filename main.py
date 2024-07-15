@@ -3,6 +3,7 @@ from typing import Union
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, Depends
 import asyncpg
+import bcrypt
 
 app = FastAPI()
 
@@ -29,20 +30,28 @@ async def create_user(user: UserBody, db: asyncpg.Connection = Depends(db_connec
         raise HTTPException(status_code=500, detail="Email is not valid")
 
     try:
+        hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt())
         query = "INSERT INTO users (name, email, password) VALUES ($1, $2, $3)"
-        await db.execute(query, user.name, user.email, user.password)
+        await db.execute(query, user.name, user.email, hashed_password.decode('utf-8'))
         return {"message": "User created successfully"}
+    except asyncpg.exceptions.UniqueViolationError:
+        raise HTTPException(status_code=400, detail="Another user has this email")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/list")
 async def list_users(db: asyncpg.Connection = Depends(db_connect)):
     try:
-        query = "SELECT id, name, email FROM users"
+        # query = "SELECT id, name, email FROM users"
+        query = "SELECT * FROM users"
         users = await db.fetch(query)
         return users
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+def check_password(password, hash_password):
+    print(password, hash_password)
+    return bcrypt.checkpw(password.encode('utf-8'), hash_password.encode('utf-8'))
 
 class UpdateNameBody(BaseModel):
     email: str
@@ -52,8 +61,16 @@ class UpdateNameBody(BaseModel):
 @app.put("/updatename")
 async def update_name(body: UpdateNameBody, db: asyncpg.Connection = Depends(db_connect)):
     try:
-        query = "UPDATE users SET name=$1 WHERE email=$2 AND password=$3"
-        await db.execute(query, body.name, body.email, body.password)
+        query = "SELECT password FROM users WHERE email = $1"
+        result = await db.fetch(query, body.email)
+        
+        hash_password = result[0]['password']
+        
+        if not check_password(body.password, hash_password):
+            raise HTTPException(status_code=500, detail="incorrect password")
+
+        query = "UPDATE users SET name=$1 WHERE email=$2"
+        await db.execute(query, body.name, body.email)
         return {"message": "User updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
