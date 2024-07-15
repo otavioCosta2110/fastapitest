@@ -1,3 +1,4 @@
+import re
 from typing import Union
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, Depends
@@ -21,6 +22,12 @@ class UserBody(BaseModel):
 
 @app.post("/create")
 async def create_user(user: UserBody, db: asyncpg.Connection = Depends(db_connect)):
+    if len(user.password) < 8:
+        raise HTTPException(status_code=500, detail="Password must bee longer than 8 chars")
+
+    if not re.match(r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$', user.email):
+        raise HTTPException(status_code=500, detail="Email is not valid")
+
     try:
         query = "INSERT INTO users (name, email, password) VALUES ($1, $2, $3)"
         await db.execute(query, user.name, user.email, user.password)
@@ -50,7 +57,6 @@ async def update_name(body: UpdateNameBody, db: asyncpg.Connection = Depends(db_
         return {"message": "User updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.delete("/delete/{id}")
 async def delete_users(id: int, db: asyncpg.Connection = Depends(db_connect)):
