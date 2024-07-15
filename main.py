@@ -38,15 +38,15 @@ async def list_users(db: asyncpg.Connection = Depends(db_connect)):
         raise HTTPException(status_code=500, detail=str(e))
 
 class UpdateNameBody(BaseModel):
-    id: int
+    email: str
     name: str
     password: str
 
 @app.put("/updatename")
 async def update_name(body: UpdateNameBody, db: asyncpg.Connection = Depends(db_connect)):
     try:
-        query = "UPDATE users SET name=$1 WHERE id=$2 AND password=$3"
-        await db.execute(query, body.name, body.id, body.password)
+        query = "UPDATE users SET name=$1 WHERE email=$2 AND password=$3"
+        await db.execute(query, body.name, body.email, body.password)
         return {"message": "User updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
