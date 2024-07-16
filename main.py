@@ -42,7 +42,6 @@ async def create_user(user: UserBody, db: asyncpg.Connection = Depends(db_connec
 @app.get("/list")
 async def list_users(db: asyncpg.Connection = Depends(db_connect)):
     try:
-        # query = "SELECT id, name, email FROM users"
         query = "SELECT * FROM users"
         users = await db.fetch(query)
         return users
