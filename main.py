@@ -1,6 +1,5 @@
+import os
 import re
-from typing import Union
-from dotenv.main import os
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, Depends
 import asyncpg
