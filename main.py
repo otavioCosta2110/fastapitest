@@ -21,6 +21,10 @@ class UserBody(BaseModel):
     email: str
     password: str
 
+@app.get("/")
+async def healthcheck():
+    return {"message": "I'm healthy'"}
+
 @app.post("/create")
 async def create_user(user: UserBody, db: asyncpg.Connection = Depends(db_connect)):
     if len(user.password) < 8:
