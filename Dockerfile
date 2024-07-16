@@ -1,5 +1,4 @@
 FROM python:latest
-# FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim AS builder
 
 WORKDIR /python/app
 
