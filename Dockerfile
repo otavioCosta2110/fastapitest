@@ -9,6 +9,9 @@ RUN apt-get update && apt-get upgrade -y \
 COPY requirements.txt ./
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+USER appuser
+
 EXPOSE 8000
 
 HEALTHCHECK --interval=5m --timeout=3s \
