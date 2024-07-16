@@ -1,15 +1,11 @@
-FROM python:3.12.4
+FROM python:3.9-alpine
 
 WORKDIR /python/app
-
-RUN apt-get update && apt-get upgrade -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN addgroup -S appuser && adduser -S appuser -G appuser
 USER appuser
 
 EXPOSE 8000
