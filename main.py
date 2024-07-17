@@ -55,7 +55,6 @@ async def list_users(db: asyncpg.Connection = Depends(db_connect)):
         raise HTTPException(status_code=500, detail=str(e))
 
 def check_password(password, hash_password):
-    print(password, hash_password)
     return bcrypt.checkpw(password.encode('utf-8'), hash_password.encode('utf-8'))
 
 class UpdateNameBody(BaseModel):
