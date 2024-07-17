@@ -10,7 +10,7 @@ jobs:
 
   build:
 
-    runs-on: otaviocosta2110/fastpython
+    runs-on: alpine-latest
 
     steps:
     - uses: actions/checkout@v4
