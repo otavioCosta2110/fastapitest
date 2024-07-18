@@ -14,5 +14,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Login into Dockerhub
+      run: echo "${{ DOCKER_PASSWD }}" | docker login -u "${{ DOCKER_USER }}" --password-stdin
+        
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag otaviocosta2110/fastpython:$(date +%s)
+      run: docker build . --file Dockerfile --tag otaviocosta2110/fastpython:latest
+    
+    - name: Upload image to Dockerhub
+      run: |
+        docker push otaviocosta2110/fastpython:latest
