@@ -1,0 +1,26 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Login into Dockerhub
+      run: echo "${{ secrets.DOCKER_PASSWD }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+        
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag otaviocosta2110/fastpython:latest
+    
+    - name: Upload image to Dockerhub
+      run: |
+        docker push otaviocosta2110/fastpython:latest
