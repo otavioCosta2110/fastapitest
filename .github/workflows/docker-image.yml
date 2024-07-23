@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "github-actions" ]
   pull_request:
     branches: [ "main" ]
 
@@ -20,6 +20,17 @@ jobs:
         
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag otaviocosta2110/fastpython:latest
+
+    - name: Check for vulnerabilities with trivy
+      run: |
+        sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update -y
+        sudo apt-get install trivy -y
+
+        chmod +x .github/workflows/trivy.sh
+        ./.github/workflows/trivy.sh
     
     - name: Upload image to Dockerhub
       run: |

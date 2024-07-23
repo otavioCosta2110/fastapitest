@@ -1,6 +1,6 @@
 #!/bin/bash
 
-trivy image --exit-code 1 --severity HIGH,CRITICAL fastpython_web
+trivy image --exit-code 1 --severity HIGH,CRITICAL otaviocosta2110/fastpython:latest
 
 EXIT_CODE=$?
 
