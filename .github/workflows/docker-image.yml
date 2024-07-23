@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "github-actions" ]
   pull_request:
     branches: [ "main" ]
 
@@ -23,6 +23,12 @@ jobs:
 
     - name: Check for vulnerabilities with trivy
       run: |
+        apt-get install wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        apt-get update
+        apt-get install trivy
+
         chmod +x .github/workflows/trivy.sh
         ./.github/workflows/trivy.sh
     
