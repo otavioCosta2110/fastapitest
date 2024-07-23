@@ -2,7 +2,7 @@ FROM python:alpine
 
 WORKDIR /python/app
 
-COPY requirements.txt ./
+COPY . .
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 RUN addgroup -S appuser && adduser -S appuser -G appuser

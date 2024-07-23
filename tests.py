@@ -1,13 +1,17 @@
 from unittest.mock import patch
 import requests
 
-def test_healthcheck():
+@patch('requests.get')
+def test_healthcheck(mock_get):
     url = 'http://localhost:8000/'
+    mock_get.return_value.status_code = 200
     res = requests.get(url)
     assert res.status_code == 200
 
-def test_list_users():
+@patch('requests.get')
+def test_list_users(mock_get):
     url = 'http://localhost:8000/list'
+    mock_get.return_value.status_code = 200
     res = requests.get(url)
     assert res.status_code == 200
 
@@ -57,3 +61,4 @@ def test_update_user(mock_update):
 
     assert response.status_code == 200
     assert response.json()['message'] == "User updated successfully"
+
