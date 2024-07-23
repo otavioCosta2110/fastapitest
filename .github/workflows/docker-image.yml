@@ -31,6 +31,9 @@ jobs:
 
         chmod +x .github/workflows/trivy.sh
         ./.github/workflows/trivy.sh
+    - name: Run tests
+      run: |
+        docker run --rm otaviocosta2110/fastpython:latest pytest
     
     - name: Upload image to Dockerhub
       run: |
