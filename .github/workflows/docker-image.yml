@@ -33,7 +33,7 @@ jobs:
         ./.github/workflows/trivy.sh
     - name: Run tests
       run: |
-        docker run --rm otaviocosta2110/fastpython:latest pytest
+        docker run --rm otaviocosta2110/fastpython:latest pytest --disable-warnings
     
     - name: Upload image to Dockerhub
       run: |
