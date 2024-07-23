@@ -31,7 +31,11 @@ jobs:
 
         chmod +x .github/workflows/trivy.sh
         ./.github/workflows/trivy.sh
+    - name: Run tests
+      run: |
+        docker run --rm otaviocosta2110/fastpython:latest pytest tests.py --disable-warnings
     
     - name: Upload image to Dockerhub
       run: |
         docker push otaviocosta2110/fastpython:latest
+
