@@ -23,11 +23,11 @@ jobs:
 
     - name: Check for vulnerabilities with trivy
       run: |
-        apt-get install wget apt-transport-https gnupg lsb-release
+        sudo apt-get install wget apt-transport-https gnupg lsb-release -y
         wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
         echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
-        apt-get update
-        apt-get install trivy
+        sudo apt-get update -y
+        sudo apt-get install trivy -y
 
         chmod +x .github/workflows/trivy.sh
         ./.github/workflows/trivy.sh
