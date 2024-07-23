@@ -2,3 +2,5 @@ fastapi
 asyncpg
 bcrypt
 uvicorn
+pytest
+requests
