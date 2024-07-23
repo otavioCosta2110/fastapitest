@@ -20,6 +20,11 @@ jobs:
         
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag otaviocosta2110/fastpython:latest
+
+    - name: Check for vulnerabilities with trivy
+      run: |
+        chmod +x .github/workflows/trivy.sh
+        ./.github/workflows/trivy.sh
     
     - name: Upload image to Dockerhub
       run: |
