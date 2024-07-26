@@ -1,3 +1,6 @@
+# para funcionar precisa dos secrets que estao no .env
+# kubectl create secret generic postgres-credentials --from-env-file=.env
+# se estiver usando minikube, utilize o tunnel pro loadbalancer funcionar
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5,7 +8,7 @@ metadata:
   labels: 
     app: fastapi  
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: fastapi 
@@ -27,10 +30,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  labels: 
+  labels:
     app: postgres
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: postgres
@@ -40,14 +43,20 @@ spec:
         app: postgres
     spec:
       containers:
-        - name: db
+        - name: postgres
           image: "postgres:latest"
           ports:
             - containerPort: 5432
           envFrom:
             - secretRef:
                 name: postgres-credentials
-          command: ["bash", "-c", "psql -U ${POSTGRES_USER} -c 'CREATE TABLE IF NOT EXISTS users (id serial PRIMARY KEY, name varchar(255), email varchar(255), password varchar(255));'"]
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-storage
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-volume-claim
 ---
 apiVersion: v1
 kind: Service
@@ -60,15 +69,36 @@ spec:
     - protocol: TCP
       port: 8000
       targetPort: 8000
+  type: LoadBalancer 
+
 ---
 apiVersion: v1
-kind: Service
+kind: PersistentVolume
 metadata:
-  name: postgres-service
-spec:
-  selector:
+  name: postgres-volume
+  labels:
+    type: local
     app: postgres
-  ports:
-    - protocol: TCP
-      port: 5432
-      targetPort: 5432
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /data/postgresql
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-volume-claim
+  labels:
+    app: postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+---
